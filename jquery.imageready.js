@@ -80,10 +80,10 @@
 			
 			
 			// Callbacks.
-			success: 		function( stack, cfg ) {},
-			onError: 		function( stack, cfg ) {},
-			stepSuccess:	function( stack, cfg ) {},
-			stepOnError:	function( stack, cfg ) {},
+			success: 		function( cfg ) {},
+			onError: 		function( cfg ) {},
+			stepSuccess:	function( cfg, stack ) {},
+			stepOnError:	function( cfg, stack ) {},
 			
 			
 			
@@ -165,13 +165,15 @@
 						cfg.complete.push( this );
 						
 						// Step success callback
-						cfg.stepSuccess.call( this, _this, cfg );
+						cfg.stepSuccess.call( this, cfg, _this );
 						
-						if ( _count <= 0 ) {
+						
+						// Timeout happens!
+						if ( _count <= 0 || (cfg.complete.length + cfg.errors.length) >= _this.length ) {
 							
 							clearTimeout(_errorTimeout);
 							
-							cfg.success.call( _this, cfg, cfg.complete, cfg.errors );
+							cfg.success.call( _this, cfg );
 						}
 						
 					},
@@ -181,7 +183,16 @@
 						cfg.errors.push(this); 
 						
 						// Step onError callback
-						cfg.stepOnError.call( this, _this, cfg );
+						cfg.stepOnError.call( this, cfg, _this );
+						
+						
+						// Timeout happens!
+						if ( _count <= 0 || (cfg.complete.length + cfg.errors.length) >= _this.length ) {
+							
+							clearTimeout(_errorTimeout);
+							
+							cfg.onError.call( _this, cfg );
+						}
 						
 					}
 					
@@ -197,7 +208,7 @@
 				// Setup the "onError" check across multiple images.
 				_errorTimeout = setTimeout(function(){
 					
-					cfg.onError.call( _this, cfg, cfg.complete, cfg.errors );
+					cfg.onError.call( _this, cfg );
 				
 				},cfg.stackTimeout);
 				
