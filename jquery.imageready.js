@@ -80,10 +80,12 @@
 			
 			
 			// Callbacks.
-			success: 		function( cfg ) {},
+			onComplete:		function( cfg ) {},
+			onSuccess: 		function( cfg ) {},
 			onError: 		function( cfg ) {},
-			stepSuccess:	function( cfg, stack ) {},
-			stepOnError:	function( cfg, stack ) {},
+			onStepComplete:	function( cfg, stack ) {},
+			onStepSuccess:	function( cfg, stack ) {},
+			onStepError:	function( cfg, stack ) {},
 			
 			
 			
@@ -104,7 +106,7 @@
 	 */
 	$.fn.imageReady = function() {
 		
-		// Proprietˆ di configurazione interna.
+		// Proprietà di configurazione interna.
 		var cfg = $.extend({},{},$.imageReady.defaults);
 		
 		// Extends configuration with an object
@@ -158,14 +160,19 @@
 				// by decreasing the total number of remaining images.
 				var localCfg = $.extend({},cfg,{
 					
-					success: function( localCfg ) {
+					onComplete: function( localCfg ) {
+					
+					},
+					
+					onSuccess: function( localCfg ) {
 						
 						_count--;
 						
 						cfg.complete.push( this );
 						
 						// Step success callback
-						cfg.stepSuccess.call( this, cfg, _this );
+						if ( cfg.onStepComplete.call( this, cfg, _this ) === false ) return;
+						if ( cfg.onStepSuccess.call( this, cfg, _this ) === false ) return;
 						
 						
 						// Timeout happens!
@@ -173,7 +180,8 @@
 							
 							clearTimeout(_errorTimeout);
 							
-							cfg.success.call( _this, cfg );
+							if ( cfg.onComplete.call( _this, cfg ) === false ) return;
+							if ( cfg.onSuccess.call( _this, cfg ) === false ) return;
 						}
 						
 					},
@@ -183,7 +191,8 @@
 						cfg.errors.push(this); 
 						
 						// Step onError callback
-						cfg.stepOnError.call( this, cfg, _this );
+						if ( cfg.onStepComplete.call( this, cfg, _this ) === false ) return;
+						if ( cfg.onStepError.call( this, cfg, _this ) === false ) return;
 						
 						
 						// Timeout happens!
@@ -191,7 +200,8 @@
 							
 							clearTimeout(_errorTimeout);
 							
-							cfg.onError.call( _this, cfg );
+							if ( cfg.onComplete.call( _this, cfg ) === false ) return;
+							if ( cfg.onError.call( _this, cfg ) === false ) return;
 						}
 						
 					}
@@ -208,7 +218,8 @@
 				// Setup the "onError" check across multiple images.
 				_errorTimeout = setTimeout(function(){
 					
-					cfg.onError.call( _this, cfg );
+					if ( cfg.onComplete.call( _this, cfg ) === false ) return;
+					if ( cfg.onError.call( _this, cfg ) === false ) return;
 				
 				},cfg.stackTimeout);
 				
@@ -248,7 +259,8 @@
 			$(this).removeClass(cfg.checkingClass).addClass(cfg.successClass);
 			
 			// Apply success callback
-			cfg.success.call( this, cfg );
+			if ( cfg.onComplete.call( this, cfg ) === false ) return;
+			if ( cfg.onSuccess.call( this, cfg ) === false ) return;
 			
 			return;
 			
@@ -264,7 +276,8 @@
 			$(this).removeClass(cfg.checkingClass).addClass(cfg.errorClass);
 			
 			// Apply error callback
-			cfg.onError.call( this, cfg );
+			if ( cfg.onComplete.call( this, cfg ) === false ) return;
+			if ( cfg.onError.call( this, cfg ) === false ) return;
 			
 			return;
 		
