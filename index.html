@@ -357,7 +357,7 @@
 				
 				<dt>mode</dt>
 				<dd>
-					[each|all] (default "each")
+					[EACH|ALL] (default "each")
 				</dd>
 				
 				<dt>step</dt>
@@ -388,7 +388,15 @@
 					(default: "imageready-error") a CSS class assigned to the image DOM when timeout happen.
 				</dd>
 				
-				<dt>success(cfg)</dt>
+				<dt>onComplete(cfg)</dt>
+				<dd>
+					callback throwed when an image (or a group of images) are checked. <br>
+					<strong>it does not care if image(s) loads correctly or not.</strong><br />
+					It receive the image itself as context in "each" mode.<br>
+					It receive the images stack as context in "all" mode.
+				</dd>
+				
+				<dt>onSuccess(cfg)</dt>
 				<dd>
 					callback throwed when an image (or a group of images) is ready.<br />
 					It receive the image itself as context in "each" mode.<br>
@@ -402,13 +410,19 @@
 					It receive the images stack as context in "all" mode.
 				</dd>
 				
-				<dt>stepSuccess(cfg,stack)</dt>
+				<dt>onStepComplete(cfg,stack)</dt>
 				<dd>
-					It works like <em>success()</em> but is used internally by the "all" mode.<br>
+					It works like <em>onComplete()</em> but is used internally by the "all" mode.<br>
 					It is throwed on each single image in a stack.
 				</dd>
 				
-				<dt>stepOnError(cfg,stack)</dt>
+				<dt>onStepSuccess(cfg,stack)</dt>
+				<dd>
+					It works like <em>onSuccess()</em> but is used internally by the "all" mode.<br>
+					It is throwed on each single image in a stack.
+				</dd>
+				
+				<dt>onStepError(cfg,stack)</dt>
 				<dd>
 					It works like <em>onError()</em> but is used internally by the "all" mode.<br>
 					It is throwed on each single image in a stack.
